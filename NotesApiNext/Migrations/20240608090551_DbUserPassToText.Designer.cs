@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NotesApiNext.Database;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NotesApiNext.Migrations
 {
     [DbContext(typeof(NotesNextDbContext))]
-    partial class NotesNextDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240608090551_DbUserPassToText")]
+    partial class DbUserPassToText
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,10 +68,10 @@ namespace NotesApiNext.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<byte[]>("Password")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("bytea");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("RegistrDateTime")
                         .HasColumnType("timestamp without time zone");

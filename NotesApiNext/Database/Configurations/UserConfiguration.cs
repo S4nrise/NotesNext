@@ -10,6 +10,8 @@ namespace NotesApiNext.Database.Configurations
         {
             builder.HasKey(user => user.UserId);
             builder.Property(user => user.UserName).HasMaxLength(100);
+            builder.Property(user => user.Email).HasMaxLength(100);
+            builder.Property(user => user.Password).HasMaxLength(100);
         }
     }
 }

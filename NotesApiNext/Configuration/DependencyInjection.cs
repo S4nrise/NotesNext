@@ -1,4 +1,6 @@
-﻿namespace NotesApiNext.Configuration
+﻿using System.Reflection;
+
+namespace NotesApiNext.Configuration
 {
     public static class DependencyInjection
     {
@@ -8,7 +10,7 @@
                 .AddControllers()
                 
                 ;
-
+            //services.AddAutoMapper(cfg => cfg.AddProfile(/*new NoteMappingProfile(dateTimeProvider)*/));
             return services;
         }
 
@@ -17,5 +19,6 @@
 
             return services;
         }
+
     }
 }
