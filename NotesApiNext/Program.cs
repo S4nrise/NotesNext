@@ -23,12 +23,12 @@ builder.Services.AddAutoMapper(config =>
          config.AddProfile(new NoteMappingProfile(dateTimeProvider));
      });
 
-//builder.Services.AddDbContext<NotesNextDbContext>(options => options.UseNpgsql(
-//    builder.Configuration.GetConnectionString("PostgreSqlConnection")));
-var con = builder.Configuration.GetConnectionString("PostgreSqlConnection");
+var postgreSqlConnection = builder.Configuration
+    .GetRequiredSection(nameof(PostgreSQLConnection))
+    .Get<PostgreSQLConnection>();
 builder.Services.AddDbContext<NotesNextDbContext>(options =>
 {
-    options.UseNpgsql(con);
+    options.UseNpgsql(postgreSqlConnection!.ConnectionString);
 });
 var app = builder.Build();
 

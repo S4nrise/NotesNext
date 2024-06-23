@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>26f493cb-b30e-4721-8bc6-cc682dc21c84</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
