@@ -12,14 +12,15 @@ namespace NotesApiNext.Mapping
             CreateMap<Note, ListNoteVm>()
                 .ForMember(note => note.Id, opt => opt.MapFrom(note => note.Id))
                 .ForMember(note => note.Title, opt => opt.MapFrom(note => note.Title))
-                .ForMember(note => note.IsCompleted, opt => opt.MapFrom(note => note.IsCompleted));
+                .ForMember(note => note.IsCompleted, opt => opt.MapFrom(note => note.IsCompleted))
+                .ForMember(note => note.Priority, opt => opt.MapFrom(note => note.Priority.ToString()));
                 
             CreateMap<Note, DetailedNoteVm>()
                 .ForCtorParam(nameof(DetailedNoteVm.Id), opt => opt.MapFrom(note => note.Id))
                 .ForCtorParam(nameof(DetailedNoteVm.Title), opt => opt.MapFrom(note => note.Title))
                 .ForCtorParam(nameof(DetailedNoteVm.Description), opt => opt.MapFrom(note => note.Description))
                 .ForCtorParam(nameof(DetailedNoteVm.IsCompleted), opt => opt.MapFrom(note => note.IsCompleted))
-                .ForCtorParam(nameof(DetailedNoteVm.Priority), opt => opt.MapFrom(note => note.Priority));
+                .ForCtorParam(nameof(DetailedNoteVm.Priority), opt => opt.MapFrom(note => note.Priority.ToString()));
 
             CreateMap<CreateNoteDto, Note>()
                 .ForMember(note => note.Id, opt => opt.MapFrom( _ => Guid.NewGuid()))

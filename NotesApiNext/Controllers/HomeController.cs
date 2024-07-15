@@ -1,66 +1,55 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NotesApiNext.ApiTypes;
 using NotesApiNext.Database;
 using NotesApiNext.Interfaces;
 using NotesApiNext.Models.Note;
-using NotesApiNext.Models.User;
-using System.Text;
 
 
 namespace NotesApiNext.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HomeController(NotesNextDbContext notesNextDbContext, IDateTimeProvider dateTimeProvider, IMapper mapper) : Controller
+    public class HomeController(NotesNextDbContext notesNextDbContext,
+        IDateTimeProvider dateTimeProvider,
+        IMapper mapper,
+        INoteRepository noteRepository,
+        IUserRepository userRepository) : Controller
     {
         [HttpPost("~/CreateNote")]
-        public async Task<IActionResult> CreateNote(CreateNoteDto createNoteDto)
+        public async Task<IActionResult> CreateNote(CreateNoteDto createNoteDto, CancellationToken cancellationToken)
         {
             var note = mapper.Map<Note>(createNoteDto);
-            notesNextDbContext.Notes.Add(note);
-            await notesNextDbContext.SaveChangesAsync();
+            await noteRepository.AddNoteAsync(note, cancellationToken);
             return Created();
         }
 
         [HttpGet("~/GetAllNote")]
-        public async Task<IActionResult> GetAllNote()
+        public async Task<IActionResult> GetAllNote(Guid userId)
         {
-            var notes = await notesNextDbContext.Notes.ToListAsync();
-            return Ok(notes);
+            var notesReturn = await noteRepository.GetAllForUser(userId);
+            return Ok(notesReturn);
         }
 
         [HttpDelete("~/DeleteNote")]
-        public async Task<IActionResult> DeleteNote(Guid noteId)
+        public async Task<IActionResult> DeleteNote(Guid userId, Guid noteId)
         {
-            var note = await notesNextDbContext.Notes.FirstOrDefaultAsync(note => note.Id == noteId);
-
-            if (note == null) 
-            {
-                return BadRequest();
-            }
-            notesNextDbContext.Notes.Remove(note);
-            await notesNextDbContext.SaveChangesAsync();
-            return Ok();
+            await noteRepository.DeleteNoteAsync(userId, noteId);
+            return Ok("Deleted");
         }
 
         [HttpPut("~/EditNote")]
-        public async Task<IActionResult> EditNote(Note newNote)
+        public async Task<IActionResult> EditNote(Guid noteId, Guid userId, EditNoteDto newNote)
         {
-            var note = await notesNextDbContext.Notes.FirstOrDefaultAsync(note =>note.Id == newNote.Id);
-            if (note == null)
-            {
-                return BadRequest();
-            }
-            note.UpdatedDateTime = dateTimeProvider.UtcNow;
-            note.Title = newNote.Title;
-            note.Description = newNote.Description;
-            note.Priority = newNote.Priority;
-
-            notesNextDbContext.Notes.Update(note);
-            await notesNextDbContext.SaveChangesAsync();
+            await noteRepository.EditNoteAsync(noteId, userId, newNote);
             return Ok("Updated");
+        }
+
+        [HttpGet("~/{userId}/{noteId}")]
+        public async Task<IActionResult> GetNote(Guid userId, Guid noteId)
+        {
+            var noteReturn = await noteRepository.GetAsync(userId, noteId);
+            return Ok(noteReturn);
         }
     }
 }

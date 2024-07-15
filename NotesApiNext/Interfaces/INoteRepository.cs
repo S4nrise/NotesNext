@@ -1,13 +1,14 @@
-﻿using NotesApiNext.Models.Note;
+﻿using NotesApiNext.ApiTypes;
+using NotesApiNext.Models.Note;
 
 namespace NotesApiNext.Interfaces
 {
     public interface INoteRepository
     {
-        Note Get(Guid userId, Guid id);
-        IReadOnlyList<Note> GetAllForUser(Guid userId);
-        void Add(Note note);
-        bool Edit(Note note);
-        bool Delete(Note note);
+        Task<DetailedNoteVm> GetAsync(Guid userId, Guid id);
+        Task<IReadOnlyList<ListNoteVm>> GetAllForUser(Guid userId);
+        Task AddNoteAsync(Note note, CancellationToken cancellationToken);
+        Task EditNoteAsync(Guid userId, Guid noteId, EditNoteDto editNoteDto);
+        Task DeleteNoteAsync(Guid userId, Guid noteId);
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using NotesApiNext.Interfaces;
+using NotesApiNext.Services;
+using System.Reflection;
 
 namespace NotesApiNext.Configuration
 {
@@ -6,19 +8,20 @@ namespace NotesApiNext.Configuration
     {
         public static IServiceCollection AddNotesNext(this IServiceCollection services, IConfiguration configuration)
         {
-            services
-                .AddControllers()
-                
-                ;
+            services.AddControllers();
+            services.AddRepositories();
             //services.AddAutoMapper(cfg => cfg.AddProfile(/*new NoteMappingProfile(dateTimeProvider)*/));
             return services;
         }
 
-        private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddRepositories(this IServiceCollection services)
         {
-
+            services.AddScoped<INoteRepository, NoteRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            
             return services;
         }
 
+        
     }
 }
