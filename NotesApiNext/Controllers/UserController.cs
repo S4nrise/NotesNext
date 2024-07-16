@@ -10,22 +10,27 @@ namespace NotesApiNext.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController(NotesNextDbContext notesNextDbContext, IDateTimeProvider dateTimeProvider) : Controller
+    public class UserController(
+        NotesNextDbContext notesNextDbContext,
+        IUserRepository userRepository,
+        IDateTimeProvider dateTimeProvider) : Controller
     {
         [HttpPost("~/Registration")]
-        public async Task<IActionResult> UserRegistration(UserDto userDto)
+        public async Task<IActionResult> UserRegistration(UserDto registrDto)
         {
-            var user = new User
-            {
-                UserId = Guid.NewGuid(),
-                Email = userDto.Email,
-                UserName = userDto.UserName,
-                Password = Encoding.UTF8.GetBytes(userDto.Password),
-                RegistrDateTime = dateTimeProvider.UtcNow,
-            };
-            notesNextDbContext.Users.Add(user);
-            await notesNextDbContext.SaveChangesAsync();
+            await userRepository.AddUserAsync(registrDto);
             return Ok();
+            //var user = new User
+            //{
+            //    UserId = Guid.NewGuid(),
+            //    Email = userDto.Email,
+            //    UserName = userDto.UserName,
+            //    Password = Encoding.UTF8.GetBytes(userDto.Password),
+            //    RegistrDateTime = dateTimeProvider.UtcNow,
+            //};
+            //notesNextDbContext.Users.Add(user);
+            //await notesNextDbContext.SaveChangesAsync();
+            //return Ok();
         }
     }
 }

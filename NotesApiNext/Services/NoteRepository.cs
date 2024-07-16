@@ -8,7 +8,6 @@ namespace NotesApiNext.Services
 {
     public class NoteRepository(
         INotesNextDbContext notesNextDbContext,
-        IPasswordHashProvider passwordHashProvider,
         IMapper mapper,
         IDateTimeProvider dateTimeProvider,
         IUserRepository userRepository) : INoteRepository
@@ -49,7 +48,7 @@ namespace NotesApiNext.Services
 
         public async Task<IReadOnlyList<ListNoteVm>> GetAllForUser(Guid userId)
         {
-            //var user = userRepository.GetByUserIdAsync(userId);
+            var user = await userRepository.GetByUserIdAsync(userId);
             var userNotes = notesNextDbContext.Notes.AsNoTracking().Where(note => note.UserId == userId);
 
             await userNotes.ToListAsync();
@@ -62,7 +61,7 @@ namespace NotesApiNext.Services
             var note = await notesNextDbContext.Notes.FirstOrDefaultAsync(note => note.Id == noteId && note.UserId == userId);
             if (note is null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentException(nameof(userId), nameof(noteId));
             }
             var noteReturn = mapper.Map<DetailedNoteVm>(note);
             return noteReturn;

@@ -18,10 +18,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddNotesNext(builder.Configuration);
 var dateTimeProvider = new DateTimeProvider();
 builder.Services.AddSingleton<IDateTimeProvider>(dateTimeProvider);
-builder.Services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
 builder.Services.AddAutoMapper(config =>
      {
          config.AddProfile(new NoteMappingProfile(dateTimeProvider));
+         config.AddProfile(new UserMappingProfile(dateTimeProvider));
      });
 
 var postgreSqlConnection = builder.Configuration

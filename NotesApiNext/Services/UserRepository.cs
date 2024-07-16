@@ -30,7 +30,7 @@ namespace NotesApiNext.Services
             var user = await notesNextDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.UserId == id);
             if (user == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentException(nameof(id));
             }
             return user;
         }

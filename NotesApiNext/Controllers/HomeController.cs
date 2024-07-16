@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NotesApiNext.ApiTypes;
-using NotesApiNext.Database;
 using NotesApiNext.Interfaces;
 using NotesApiNext.Models.Note;
 
@@ -10,8 +9,7 @@ namespace NotesApiNext.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HomeController(NotesNextDbContext notesNextDbContext,
-        IDateTimeProvider dateTimeProvider,
+    public class HomeController(
         IMapper mapper,
         INoteRepository noteRepository,
         IUserRepository userRepository) : Controller

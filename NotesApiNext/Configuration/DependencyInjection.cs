@@ -10,6 +10,8 @@ namespace NotesApiNext.Configuration
         {
             services.AddControllers();
             services.AddRepositories();
+            services.AddTransient<IPasswordHashProvider, PasswordHashProvider>();
+            services.AddOptions<Settings.PasswordHashProvider>(nameof(Settings.PasswordHashProvider));
             //services.AddAutoMapper(cfg => cfg.AddProfile(/*new NoteMappingProfile(dateTimeProvider)*/));
             return services;
         }

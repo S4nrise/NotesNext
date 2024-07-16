@@ -16,7 +16,7 @@ namespace NotesApiNext.Mapping
                 .ForMember(user => user.RegistrDateTime, opt => opt.MapFrom(_ => dateTimeProvider.UtcNow))
                 .ForMember(user => user.UserName, opt => opt.MapFrom(user => user.UserName))
                 .ForMember(user => user.Email, opt => opt.MapFrom(user => user.Email))
-                .ForMember(user => user.Password, opt => opt.MapFrom(user => user.Password)); //Encode
+                .ForMember(user => user.Password, opt => opt.Ignore()); //Encode
         }
     }
 }
