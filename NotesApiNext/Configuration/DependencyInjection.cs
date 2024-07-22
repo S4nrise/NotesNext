@@ -1,4 +1,5 @@
-﻿using NotesApiNext.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using NotesApiNext.Interfaces;
 using NotesApiNext.Services;
 using System.Reflection;
 
@@ -11,7 +12,10 @@ namespace NotesApiNext.Configuration
             services.AddControllers();
             services.AddRepositories();
             services.AddTransient<IPasswordHashProvider, PasswordHashProvider>();
-            services.AddOptions<Settings.PasswordHashProvider>(nameof(Settings.PasswordHashProvider));
+            //services.AddOptions<Settings.PasswordHashProvider>("PasswordHashProvider");
+            Settings.PasswordHashProvider passwordHashProvider = new ();
+            configuration.Bind(nameof(Settings.PasswordHashProvider), passwordHashProvider);
+            services.AddSingleton(Options.Create(passwordHashProvider));
             //services.AddAutoMapper(cfg => cfg.AddProfile(/*new NoteMappingProfile(dateTimeProvider)*/));
             return services;
         }
