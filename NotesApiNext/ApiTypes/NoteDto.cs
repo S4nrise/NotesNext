@@ -1,6 +1,6 @@
 ﻿namespace NotesApiNext.ApiTypes
 {
-    public record CreateNoteDto(string Title, string? Description, bool IsCompleted, Guid UserId, string Priority);
+    public record CreateNoteDto(string Title, string? Description, bool IsCompleted, string Priority);
 
     public record EditNoteDto(string Title, string? Description, bool IsCompleted, string Priority);
 

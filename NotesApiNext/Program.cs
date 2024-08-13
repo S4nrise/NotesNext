@@ -2,27 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using NotesApiNext.Configuration;
 using NotesApiNext.Database;
 using NotesApiNext.Interfaces;
-using NotesApiNext.Mapping;
 using NotesApiNext.Middlewares;
-using NotesApiNext.Services;
 using NotesApiNext.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-//builder.Services.AddControllersWithViews();
 builder.Services.AddNotesNext(builder.Configuration);
-var dateTimeProvider = new DateTimeProvider();
-builder.Services.AddSingleton<IDateTimeProvider>(dateTimeProvider);
-builder.Services.AddAutoMapper(config =>
-     {
-         config.AddProfile(new NoteMappingProfile(dateTimeProvider));
-         config.AddProfile(new UserMappingProfile(dateTimeProvider));
-     });
 
 var postgreSqlConnection = builder.Configuration
     .GetRequiredSection(nameof(PostgreSQLConnection))

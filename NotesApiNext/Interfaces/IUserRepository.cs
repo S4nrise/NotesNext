@@ -6,7 +6,10 @@ namespace NotesApiNext.Interfaces
     public interface IUserRepository
     {
         Task<bool> IsUserExistsAsync(string userName);
-        Task AddUserAsync(UserDto userDto);
+        Task<User> AddUserAsync(UserDto userDto);
         Task<User> GetByUserIdAsync(Guid id);
+        Task<User> GetByUserEmailAsync(string email);
+
+        Task<List<string>> GetAllUsers();
     }
 }

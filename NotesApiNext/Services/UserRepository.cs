@@ -11,11 +11,11 @@ namespace NotesApiNext.Services
         IPasswordHashProvider passwordHashProvider,
         IMapper mapper) : IUserRepository
     {
-        public async Task AddUserAsync(UserDto userDto)
+        public async Task<User> AddUserAsync(UserDto userDto)
         {
-            if (await IsUserExistsAsync(userDto.UserName))
+            if (await IsUserExistsAsync(userDto.Email))
             {
-                return;
+                throw new Exception("User already exists");
             }
 
             var user = mapper.Map<User>(userDto);
@@ -23,6 +23,8 @@ namespace NotesApiNext.Services
 
             await notesNextDbContext.Users.AddAsync(user);
             await notesNextDbContext.SaveChangesAsync();
+
+            return user;
         }
 
         public async Task<User> GetByUserIdAsync(Guid id)
@@ -35,9 +37,24 @@ namespace NotesApiNext.Services
             return user;
         }
 
-        public Task<bool> IsUserExistsAsync(string userName)
+        public async Task<User> GetByUserEmailAsync(string email)
         {
-            return notesNextDbContext.Users.AsNoTracking().AnyAsync(user => user.UserName == userName);
+            var user = await notesNextDbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Email == email);
+            if (user == null)
+            {
+                throw new ArgumentException(nameof(email));
+            }
+            return user;
+        }
+
+        public Task<bool> IsUserExistsAsync(string email)
+        {
+            return notesNextDbContext.Users.AsNoTracking().AnyAsync(user => user.Email == email);
+        }
+
+        public Task<List<string>> GetAllUsers()
+        {
+            return notesNextDbContext.Users.Select(user=> user.UserName).ToListAsync();
         }
     }
 }

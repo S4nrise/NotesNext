@@ -1,36 +1,77 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NotesApiNext.ApiTypes;
-using NotesApiNext.Database;
+using NotesApiNext.Extensions;
 using NotesApiNext.Interfaces;
 using NotesApiNext.Models.User;
-using NotesApiNext.Services;
-using System.Text;
+using System.Security.Claims;
 
-namespace NotesApiNext.Controllers
+namespace NotesApiNext.Controllers;
+
+public class UserController(
+    IJwtTokenGenerator jwtTokenGenerator,
+    IJwtTokensRepository jwtTokensRepository,
+    IUserRepository userRepository,
+    IPasswordHashProvider passwordHashProvider) : BaseController
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UserController(
-        NotesNextDbContext notesNextDbContext,
-        IUserRepository userRepository,
-        IDateTimeProvider dateTimeProvider) : Controller
+    [AllowAnonymous]
+    [HttpPost("Registration")]
+    public async Task<string> Registration(UserDto userDto)
     {
-        [HttpPost("~/Registration")]
-        public async Task<IActionResult> UserRegistration(UserDto registrDto)
+        var user = await userRepository.AddUserAsync(userDto);
+        var token = GenerateAndStoreToken(user);
+
+        return token;
+    }
+
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<string> Login(UserDto loginDto)
+    {
+        var user = await userRepository.GetByUserEmailAsync(loginDto.Email);
+        var userPass = passwordHashProvider.Verify(loginDto.Password, user.Password);
+        if (!userPass)
         {
-            await userRepository.AddUserAsync(registrDto);
-            return Ok();
-            //var user = new User
-            //{
-            //    UserId = Guid.NewGuid(),
-            //    Email = userDto.Email,
-            //    UserName = userDto.UserName,
-            //    Password = Encoding.UTF8.GetBytes(userDto.Password),
-            //    RegistrDateTime = dateTimeProvider.UtcNow,
-            //};
-            //notesNextDbContext.Users.Add(user);
-            //await notesNextDbContext.SaveChangesAsync();
-            //return Ok();
+            throw new ArgumentException(nameof(loginDto.Password));
         }
+        var token = GenerateAndStoreToken(user);
+
+        return token;
+    }
+
+    [HttpDelete("logout")]
+    public IActionResult Logout(Guid userId)
+    {
+        jwtTokensRepository.Remove(userId);
+
+        return Ok();
+    }
+
+    [HttpGet]
+    public async Task<string> RefreshToken()
+    {
+        var userId = HttpContext.ExtractUserIdFromClaims();
+        if (userId is null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var user = await userRepository.GetByUserIdAsync(userId.Value);
+        var newToken = GenerateAndStoreToken(user);
+
+        return newToken;
+    }
+
+    [HttpGet("allusers")]
+    public async Task<List<string>> GetAllUsers()
+    {
+        return await userRepository.GetAllUsers();
+    }
+
+    private string GenerateAndStoreToken(User user)
+    {
+        var token = jwtTokenGenerator.GenerateToken(user);
+        jwtTokensRepository.Update(user.UserId, token);
+        return token;
     }
 }
